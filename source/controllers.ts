@@ -1,14 +1,29 @@
 import { ContactsCollection } from "./models";
-
-export type ContactsControllerOptions = {
-  action?: "get" | "save" | null;
-  params: any;
-};
-
-class ContactsController {
-  contacts: ContactsCollection = {};
-  constructor() {}
-  processOptions(options: ContactsControllerOptions) {}
+export interface ContactsControllerOptions {
+  action: "get" | "save"; 
+  params: any; 
 }
 
-export { ContactsController };
+export class ContactsController{
+  model: ContactsCollection
+  constructor() {
+    //instancia y ejecución de load()
+    this.model = new ContactsCollection()
+    this.model.load()
+  } 
+  processOptions(op:ContactsControllerOptions){
+    switch (op.action){
+      case 'get':
+        if(op.params && op.params.id){
+          return this.model.getOneById(op.params.id)
+        }else{
+          return this.model.getAll()
+        }
+        case 'save':
+          this.model.addOne(op.params)
+          this.model.save()
+          return {message: 'Contacto guardado correctamente'}
+    }
+  }
+}
+
